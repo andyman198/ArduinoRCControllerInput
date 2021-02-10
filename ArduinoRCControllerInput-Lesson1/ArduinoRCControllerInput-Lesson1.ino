@@ -34,14 +34,7 @@ uint16_t RC_VALUES[RC_NUM_CHANNELS];
 uint32_t RC_START[RC_NUM_CHANNELS];
 volatile uint16_t RC_SHARED[RC_NUM_CHANNELS];
 
-void calc_input(uint8_t channel, uint8_t input_pin) {
-  if (digitalRead(input_pin) == HIGH) {
-    RC_START[channel] = micros();
-  } else {
-    uint16_t RC_COMPARE = (uint16_t)(micros() - RC_START[channel]);
-    RC_SHARED[channel] = RC_COMPARE;
-  }
-}
+
 
 
 
@@ -62,7 +55,6 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(RC_CH2_INPUT), READ_RC2, CHANGE);
   attachInterrupt(digitalPinToInterrupt(RC_CH3_INPUT), READ_RC3, CHANGE);
   attachInterrupt(digitalPinToInterrupt(RC_CH4_INPUT), READ_RC4, CHANGE);
-
 
 }
 

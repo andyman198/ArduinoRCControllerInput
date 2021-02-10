@@ -11,9 +11,6 @@
   
 */
 
-// Import the interrupts library
-#include <EnableInterrupt.h>
-
 // Set the port speed for host communication
 #define SERIAL_PORT_SPEED 115200
 
@@ -46,10 +43,6 @@ void calc_input(uint8_t channel, uint8_t input_pin) {
   }
 }
 
-void calc_ch1() { calc_input(RC_CH1, RC_CH1_INPUT); }
-void calc_ch2() { calc_input(RC_CH2, RC_CH2_INPUT); }
-void calc_ch3() { calc_input(RC_CH3, RC_CH3_INPUT); }
-void calc_ch4() { calc_input(RC_CH4, RC_CH4_INPUT); }
 
 
 // Setup our program
@@ -65,20 +58,12 @@ void setup() {
   pinMode(RC_CH4_INPUT, INPUT);
 
   // Attach interrupts to our pins
-  //enableInterrupt(RC_CH1_INPUT, READ_RC1, CHANGE);
-  //enableInterrupt(RC_CH2_INPUT, READ_RC2, CHANGE);
-  //enableInterrupt(RC_CH3_INPUT, READ_RC3, CHANGE);
-  //enableInterrupt(RC_CH4_INPUT, READ_RC4, CHANGE);
-  
-  //attachInterrupt(digitalPinToInterrupt(RC_CH1_INPUT), READ_RC1, CHANGE);
-  //attachInterrupt(digitalPinToInterrupt(RC_CH2_INPUT), READ_RC2, CHANGE);
-  //attachInterrupt(digitalPinToInterrupt(RC_CH3_INPUT), READ_RC3, CHANGE);
-  //attachInterrupt(digitalPinToInterrupt(RC_CH4_INPUT), READ_RC4, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RC_CH1_INPUT), READ_RC1, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RC_CH2_INPUT), READ_RC2, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RC_CH3_INPUT), READ_RC3, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(RC_CH4_INPUT), READ_RC4, CHANGE);
 
-  enableInterrupt(RC_CH1_INPUT, calc_ch1, CHANGE);
-  enableInterrupt(RC_CH2_INPUT, calc_ch2, CHANGE);
-  enableInterrupt(RC_CH3_INPUT, calc_ch3, CHANGE);
-  enableInterrupt(RC_CH4_INPUT, calc_ch4, CHANGE);
+
 }
 
 
@@ -87,12 +72,6 @@ void loop() {
   // read the values from our RC Receiver
   rc_read_values();
   
-  // convenience variables
-  //channel1_val = (float)RC_VALUES[RC_CH1];  // Read the pulse width of 
-  //channel2_val = (float)RC_VALUES[RC_CH2];  // each channel
-  //channel3_val = (float)RC_VALUES[RC_CH3];
-  //channel4_val = (float)RC_VALUES[RC_CH4];
-
   // output our values to the serial port in a format the plotter can use
   Serial.print(  RC_VALUES[RC_CH1]);  Serial.print(",");
   Serial.print(  RC_VALUES[RC_CH2]);  Serial.print(",");

@@ -153,6 +153,44 @@ void loop() {
   rc_translate_values();
 
 
+  // Now its over to you!
+  /* 
+     Now you can use the newly translated values in your project, you can access them like this:
+
+     Channel 1 = RC_TRANSLATED_VALUES[0]
+     Channel 2 = RC_TRANSLATED_VALUES[1]
+     Channel 3 = RC_TRANSLATED_VALUES[2]
+     etc
+ 
+     assuming you set them to a range you can use, you could position a servo
+     or drive a motor or even pass them through to an odrive or ROS
+
+                here's an example:
+                #include <Servo.h>
+                Servo servo1; int servoPin1 = 9;
+                Servo servo2; int servoPin1 = 10;
+                Servo servo3; int servoPin1 = 11;
+
+                void setup(){
+                  servo1.attach(servoPin1);
+                  servo2.attach(servoPin2);
+                  servo3.attach(servoPin3);
+                  
+                }
+
+                void loop(){
+                  servo1.write(RC_TRANSLATED_VALUES[0]);
+                  delay(1000);
+                  servo2.write(RC_TRANSLATED_VALUES[1]);
+                  delay(1000);
+                  servo3.write(RC_TRANSLATED_VALUES[2]);
+                  delay(1000);
+                }
+
+  */
+  
+
+
   // keep track of time
   current = micros();
 

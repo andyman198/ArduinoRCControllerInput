@@ -223,7 +223,6 @@ void rc_read_values() {
   noInterrupts();
   memcpy(RC_VALUES, (const void *)RC_SHARED, sizeof(RC_SHARED));
   interrupts();
-
 }
 
 void rc_invert_values() {
@@ -242,7 +241,7 @@ void rc_invert_values() {
       } else if (RC_CHANNEL_MODE[i] == 1) {
 
         // if this is a throttle
-        RC_VALUES[i] = RC_HIGH[i] - (RC_VALUES[i]- RC_LOW[i] );
+        RC_VALUES[i] = RC_HIGH[i] - (RC_VALUES[i] - RC_LOW[i]);
       }
     }
 
@@ -263,21 +262,10 @@ void rc_invert_values() {
 void rc_translate_values() {
 
   // Loop through all our channels
-  for (int i = 0; i < RC_NUM_CHANNELS; i++) {  // Use this formula to work out where we are in the new range
-                                               // NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                                               //
-                                               // this formula was lovingly stolen from https://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+  for (int i = 0; i < RC_NUM_CHANNELS; i++) {
 
-    float oldvalue = (float)RC_VALUES[i];
-    float oldmax = (float)RC_HIGH[i];
-    float oldmin = (float)RC_LOW[i];
-
-    float newmax = RC_TRANSLATED_HIGH[i];
-    float newmin = RC_TRANSLATED_LOW[i];
-
-    float newval = (((oldvalue - oldmin) * (newmax - newmin)) / (oldmax - oldmin)) + newmin;
-    //Serial.println(oldvalue);
-    RC_TRANSLATED_VALUES[i] = newval;
+    // translate the RC channel value into our new number range
+    RC_TRANSLATED_VALUES[i] = translateValueIntoNewRange((float)RC_VALUES[i], (float)RC_HIGH[i], (float)RC_LOW[i], RC_TRANSLATED_HIGH[i], RC_TRANSLATED_LOW[i]);
   }
 }
 
@@ -315,40 +303,35 @@ void rc_deadzone_adjust() {
   // Lets convert our range into -100 to 100 so we can compare against our deadzone percent
   for (int i = 0; i < RC_NUM_CHANNELS; i++) {
     // first off, we cant divide by zero so lets get that out the way
-    //float rcvalue = (float)RC_VALUES[i];
-    //float oldmax = (float)RC_HIGH[i];
-    // float oldmin = (float)RC_LOW[i];
-
-    //float newmax = 100.0;
-    //float newmin = -100.0;
-
-    // float newval = (((oldvalue - oldmin) * (newmax - newmin)) / (oldmax - oldmin)) + newmin;
 
     float newval = 0;
 
     if (RC_CHANNEL_MODE[i] == 0) {
       // if this is a joystick with a midpoint, our deadzone should be around the middle
       newval = translateValueIntoNewRange((float)RC_VALUES[i], (float)RC_HIGH[i], (float)RC_LOW[i], 100.0, -100.0);
+
       if (abs(newval) < RC_DZPERCENT[i]) {
+        // reset to the midpoint if we are in the deadzone
         RC_VALUES[i] = RC_MID[i];
       }
-      // }
+
     } else if (RC_CHANNEL_MODE[i] == 1) {
       // if this is a throttle, our deadzone should be at the low point
       newval = translateValueIntoNewRange((float)RC_VALUES[i], (float)RC_HIGH[i], (float)RC_LOW[i], 100.0, 0.0);
+
       if (abs(newval) < RC_DZPERCENT[i]) {
+        // reset to the low point if we are in the deadzone
         RC_VALUES[i] = RC_LOW[i];
       }
     }
-    //float
-    //Serial.print(newval);
-    //Serial.print(RC_TRANSLATED_VALUES[i]);
-    //if (i < (RC_NUM_CHANNELS - 1)) Serial.print(", ");
-    //Serial.print(", ");
-    // if we are less than the deadzone percent, set it to the mid value
   }
 }
 
 float translateValueIntoNewRange(float currentvalue, float currentmax, float currentmin, float newmax, float newmin) {
+  // Use this formula to work out where we are in the new range
+  // NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+  //
+  // this formula was lovingly stolen from https://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+
   return (((currentvalue - currentmin) * (newmax - newmin)) / (currentmax - currentmin)) + newmin;
 }
